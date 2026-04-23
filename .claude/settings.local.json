@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir *)",
+      "Bash(C:\\\\Users\\\\56683\\\\source\\\\repos\\\\refatoração Bsoft/backend/venv/Scripts/python.exe *)",
+      "Bash(\"C:\\\\Users\\\\56683\\\\source\\\\repos\\\\refatoração Bsoft/backend/venv/Scripts/pip.exe\" list)",
+      "Bash(C:\\\\Users\\\\56683\\\\source\\\\repos\\\\refatoração Bsoft/backend/venv/Scripts/pip.exe install *)",
+      "Bash(\"venv/Scripts/python.exe\" manage.py makemigrations)",
+      "Bash(\"venv/Scripts/python.exe\" manage.py makemigrations authentication)",
+      "Bash(\"venv/Scripts/python.exe\" manage.py migrate)",
+      "Bash(\"venv/Scripts/python.exe\" manage.py runserver)",
+      "Bash(\"venv/Scripts/python.exe\" manage.py runserver --noreload)",
+      "Bash(curl *)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(taskkill /PID 10704 /F)",
+      "Bash(taskkill /PID 4308 /F)",
+      "Bash(cmd *)",
+      "Bash(powershell *)",
+      "Bash(xargs ls *)",
+      "Bash(npx vitest *)"
+    ]
+  }
+}

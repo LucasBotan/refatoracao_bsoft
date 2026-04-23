@@ -1,0 +1,73 @@
+# =========================
+# GERAL
+# =========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
+# =========================
+# ENV (variáveis sensíveis)
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# PYTHON / DJANGO (BACKEND)
+# =========================
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Django
+db.sqlite3
+staticfiles/
+media/
+
+# =========================
+# NODE / FRONTEND
+# =========================
+node_modules/
+dist/
+build/
+
+# Logs do Node
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite
+.vite/
+
+# =========================
+# EDITORES / IDE
+# =========================
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+.idea/
+
+# =========================
+# TESTES / CACHE
+# =========================
+.coverage
+htmlcov/
+.pytest_cache/
+
+# =========================
+# OUTROS
+# =========================
+*.bak
+*.old
+
+# Node
+node_modules/
+frontend/node_modules/
