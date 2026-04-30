@@ -27,6 +27,8 @@ export type Capability =
   | 'view_relatorios'
   | 'view_usuarios'
   | 'view_configuracoes'
+  | 'view_varejistas'
+  | 'view_entrada_nota_fiscal'
 
 /**
  * Mapeamento capability → grupos que a concedem.
@@ -38,19 +40,21 @@ export type Capability =
  * Grupos observados: ADMIN, FINANCEIRO (via FinanceView, AdminOnlyView)
  */
 const CAPABILITY_GROUPS: Record<Capability, string[]> = {
-  // Módulos operacionais — acessíveis a todos os autenticados
+  // Todos os módulos acessíveis a qualquer autenticado enquanto grupos Azure AD
+  // não estiverem criados no tenant. Restaurar restrições por grupo quando os
+  // grupos estiverem provisionados.
   view_dashboard:    [],
   view_ordens:       [],
   view_apontamentos: [],
   view_maquinas:     [],
   view_qualidade:    [],
-
-  // Módulos de gestão — requerem grupo específico ou ADMIN
-  view_estoque:      ['ESTOQUE', 'ADMIN'],
-  view_manutencao:   ['MANUTENCAO', 'MANUTENCÃO', 'ADMIN'],
-  view_relatorios:   ['FINANCEIRO', 'GESTAO', 'GESTÃO', 'ADMIN'],
-  view_usuarios:     ['ADMIN'],
-  view_configuracoes: ['ADMIN'],
+  view_estoque:      [],
+  view_manutencao:   [],
+  view_relatorios:   [],
+  view_usuarios:     [],
+  view_configuracoes: [],
+  view_varejistas:        [],
+  view_entrada_nota_fiscal: [],
 }
 
 /**

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     # Local
     'authentication',
+    'core',
 ]
 
 # ==============================================================================
@@ -218,6 +219,11 @@ LOGGING = {
     'loggers': {
         # Logger dedicado para o app de autenticação
         'authentication': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'core': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,

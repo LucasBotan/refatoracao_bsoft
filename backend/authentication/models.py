@@ -5,6 +5,8 @@ User estende AbstractUser para manter compatibilidade total com o sistema
 de autenticação do Django (admin, permissões, etc.) enquanto adiciona
 os campos necessários para integração com Azure AD.
 """
+from typing import Optional
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -43,6 +45,19 @@ class User(AbstractUser):
         ),
     )
 
+    centro_trabalho = models.ForeignKey(
+        'core.CentroDeTrabalho',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='usuarios',
+        verbose_name='Centro de Trabalho',
+        help_text=(
+            'Filial à qual o usuário está associado. '
+            'NULL indica primeiro acesso — acesso bloqueado até seleção.'
+        ),
+    )
+
     # Sobrescrever related_name para evitar conflito de acessor reverso
     # quando AUTH_USER_MODEL aponta para este modelo customizado.
     groups = models.ManyToManyField(
@@ -69,6 +84,11 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.email or self.username
+
+    @property
+    def ct(self) -> Optional[str]:
+        """Atalho para o código do centro de trabalho do usuário."""
+        return self.centro_trabalho.ct if self.centro_trabalho else None
 
     def is_in_ms_group(self, group_name: str) -> bool:
         """

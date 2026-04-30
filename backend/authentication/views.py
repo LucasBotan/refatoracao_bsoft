@@ -16,13 +16,14 @@ import urllib.parse
 
 from django.conf import settings
 from django.shortcuts import redirect
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .permissions import IsInGroup
-from .serializers import UserSerializer
+from .serializers import DefinirCentroTrabalhoSerializer, MeSerializer, UserSerializer
 from .services import graph_service, msal_service, user_service
 
 logger = logging.getLogger(__name__)
@@ -200,3 +201,60 @@ class FinanceView(APIView):
             'user': request.user.email,
             'microsoft_groups': request.user.microsoft_groups,
         })
+
+
+class MeView(APIView):
+    """
+    Retorna dados do usuário autenticado e seu centro de trabalho.
+
+    GET /me/
+
+    O frontend deve verificar `usuario_sem_ct` e redirecionar para a tela de
+    seleção de CT quando `true`. O CT nunca é aceito via request — sempre
+    derivado de `request.user.centro_trabalho`.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response(MeSerializer(request.user).data)
+
+
+class DefinirCentroTrabalhoView(APIView):
+    """
+    Associa um centro de trabalho ao usuário autenticado.
+
+    POST /usuarios/definir-centro-trabalho/
+    Body: { "centro_trabalho_id": <int> }
+
+    Regras:
+      - Permitido apenas se o usuário ainda não tiver CT (primeiro acesso).
+      - O CT é obtido pelo ID informado e validado no servidor — nunca confiado
+        via campo livre.
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.centro_trabalho_id is not None:
+            return Response(
+                {'detail': 'Centro de trabalho já definido. Não é permitido alterar após o primeiro acesso.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        serializer = DefinirCentroTrabalhoSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        from core.models import CentroDeTrabalho
+        ct = CentroDeTrabalho.objects.get(pk=serializer.validated_data['centro_trabalho_id'])
+        request.user.centro_trabalho = ct
+        request.user.save(update_fields=['centro_trabalho'])
+
+        logger.info(
+            'CT definido para usuário %s: %s (%s)',
+            request.user.email,
+            ct.nome,
+            ct.ct,
+        )
+
+        return Response(MeSerializer(request.user).data)

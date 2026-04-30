@@ -18,6 +18,8 @@ import {
   BarChart2,
   Users,
   Settings,
+  Store,
+  FileInput,
 } from 'lucide-react'
 import type { Capability } from '@/lib/authz'
 
@@ -27,7 +29,7 @@ export interface MenuItem {
   path: string
   icon: LucideIcon
   capability: Capability
-  category: 'operacao' | 'gestao'
+  category: 'operacao' | 'gestao' | 'recebimento' | 'cadastro'
   /** Descrição curta usada nos cards de atalho rápido. */
   description: string
 }
@@ -116,7 +118,29 @@ export const MENU_ITEMS: MenuItem[] = [
     category: 'gestao',
     description: 'Parâmetros do sistema',
   },
+
+  // ── Recebimento — entrada de notas e documentos fiscais ─────────────────
+  {
+    label: 'Entrada de Notas',
+    path: '/entrada-nota-fiscal',
+    icon: FileInput,
+    capability: 'view_entrada_nota_fiscal',
+    category: 'recebimento',
+    description: 'Importar NF-e via XML',
+  },
+
+  // ── Cadastro — módulos de cadastro de entidades ──────────────────────────
+  {
+    label: 'Varejistas',
+    path: '/varejistas',
+    icon: Store,
+    capability: 'view_varejistas',
+    category: 'cadastro',
+    description: 'Gerenciar varejistas',
+  },
 ]
 
 export const OPERACAO_ITEMS = MENU_ITEMS.filter((i) => i.category === 'operacao')
 export const GESTAO_ITEMS = MENU_ITEMS.filter((i) => i.category === 'gestao')
+export const RECEBIMENTO_ITEMS = MENU_ITEMS.filter((i) => i.category === 'recebimento')
+export const CADASTRO_ITEMS = MENU_ITEMS.filter((i) => i.category === 'cadastro')

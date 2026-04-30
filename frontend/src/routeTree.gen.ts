@@ -9,10 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SemCtRouteImport } from './routes/sem-ct'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CallbackRouteImport } from './routes/callback'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppVarejistasRouteImport } from './routes/_app/varejistas'
 import { Route as AppUsuariosRouteImport } from './routes/_app/usuarios'
 import { Route as AppRelatoriosRouteImport } from './routes/_app/relatorios'
 import { Route as AppQualidadeRouteImport } from './routes/_app/qualidade'
@@ -20,9 +22,18 @@ import { Route as AppOrdensRouteImport } from './routes/_app/ordens'
 import { Route as AppMaquinasRouteImport } from './routes/_app/maquinas'
 import { Route as AppManutencaoRouteImport } from './routes/_app/manutencao'
 import { Route as AppEstoqueRouteImport } from './routes/_app/estoque'
+import { Route as AppEntradaNotaFiscalRouteImport } from './routes/_app/entrada-nota-fiscal'
 import { Route as AppConfiguracoesRouteImport } from './routes/_app/configuracoes'
 import { Route as AppApontamentosRouteImport } from './routes/_app/apontamentos'
+import { Route as AppVarejistasIndexRouteImport } from './routes/_app/varejistas/index'
+import { Route as AppVarejistasNovoRouteImport } from './routes/_app/varejistas/novo'
+import { Route as AppVarejistasIdRouteImport } from './routes/_app/varejistas/$id'
 
+const SemCtRoute = SemCtRouteImport.update({
+  id: '/sem-ct',
+  path: '/sem-ct',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -40,6 +51,11 @@ const AppRoute = AppRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVarejistasRoute = AppVarejistasRouteImport.update({
+  id: '/varejistas',
+  path: '/varejistas',
   getParentRoute: () => AppRoute,
 } as any)
 const AppUsuariosRoute = AppUsuariosRouteImport.update({
@@ -77,6 +93,11 @@ const AppEstoqueRoute = AppEstoqueRouteImport.update({
   path: '/estoque',
   getParentRoute: () => AppRoute,
 } as any)
+const AppEntradaNotaFiscalRoute = AppEntradaNotaFiscalRouteImport.update({
+  id: '/entrada-nota-fiscal',
+  path: '/entrada-nota-fiscal',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppConfiguracoesRoute = AppConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -87,13 +108,30 @@ const AppApontamentosRoute = AppApontamentosRouteImport.update({
   path: '/apontamentos',
   getParentRoute: () => AppRoute,
 } as any)
+const AppVarejistasIndexRoute = AppVarejistasIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppVarejistasRoute,
+} as any)
+const AppVarejistasNovoRoute = AppVarejistasNovoRouteImport.update({
+  id: '/novo',
+  path: '/novo',
+  getParentRoute: () => AppVarejistasRoute,
+} as any)
+const AppVarejistasIdRoute = AppVarejistasIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppVarejistasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/callback': typeof CallbackRoute
   '/login': typeof LoginRoute
+  '/sem-ct': typeof SemCtRoute
   '/apontamentos': typeof AppApontamentosRoute
   '/configuracoes': typeof AppConfiguracoesRoute
+  '/entrada-nota-fiscal': typeof AppEntradaNotaFiscalRoute
   '/estoque': typeof AppEstoqueRoute
   '/manutencao': typeof AppManutencaoRoute
   '/maquinas': typeof AppMaquinasRoute
@@ -101,12 +139,18 @@ export interface FileRoutesByFullPath {
   '/qualidade': typeof AppQualidadeRoute
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
+  '/varejistas': typeof AppVarejistasRouteWithChildren
+  '/varejistas/$id': typeof AppVarejistasIdRoute
+  '/varejistas/novo': typeof AppVarejistasNovoRoute
+  '/varejistas/': typeof AppVarejistasIndexRoute
 }
 export interface FileRoutesByTo {
   '/callback': typeof CallbackRoute
   '/login': typeof LoginRoute
+  '/sem-ct': typeof SemCtRoute
   '/apontamentos': typeof AppApontamentosRoute
   '/configuracoes': typeof AppConfiguracoesRoute
+  '/entrada-nota-fiscal': typeof AppEntradaNotaFiscalRoute
   '/estoque': typeof AppEstoqueRoute
   '/manutencao': typeof AppManutencaoRoute
   '/maquinas': typeof AppMaquinasRoute
@@ -115,14 +159,19 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AppRelatoriosRoute
   '/usuarios': typeof AppUsuariosRoute
   '/': typeof AppIndexRoute
+  '/varejistas/$id': typeof AppVarejistasIdRoute
+  '/varejistas/novo': typeof AppVarejistasNovoRoute
+  '/varejistas': typeof AppVarejistasIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/callback': typeof CallbackRoute
   '/login': typeof LoginRoute
+  '/sem-ct': typeof SemCtRoute
   '/_app/apontamentos': typeof AppApontamentosRoute
   '/_app/configuracoes': typeof AppConfiguracoesRoute
+  '/_app/entrada-nota-fiscal': typeof AppEntradaNotaFiscalRoute
   '/_app/estoque': typeof AppEstoqueRoute
   '/_app/manutencao': typeof AppManutencaoRoute
   '/_app/maquinas': typeof AppMaquinasRoute
@@ -130,7 +179,11 @@ export interface FileRoutesById {
   '/_app/qualidade': typeof AppQualidadeRoute
   '/_app/relatorios': typeof AppRelatoriosRoute
   '/_app/usuarios': typeof AppUsuariosRoute
+  '/_app/varejistas': typeof AppVarejistasRouteWithChildren
   '/_app/': typeof AppIndexRoute
+  '/_app/varejistas/$id': typeof AppVarejistasIdRoute
+  '/_app/varejistas/novo': typeof AppVarejistasNovoRoute
+  '/_app/varejistas/': typeof AppVarejistasIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -138,8 +191,10 @@ export interface FileRouteTypes {
     | '/'
     | '/callback'
     | '/login'
+    | '/sem-ct'
     | '/apontamentos'
     | '/configuracoes'
+    | '/entrada-nota-fiscal'
     | '/estoque'
     | '/manutencao'
     | '/maquinas'
@@ -147,12 +202,18 @@ export interface FileRouteTypes {
     | '/qualidade'
     | '/relatorios'
     | '/usuarios'
+    | '/varejistas'
+    | '/varejistas/$id'
+    | '/varejistas/novo'
+    | '/varejistas/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/callback'
     | '/login'
+    | '/sem-ct'
     | '/apontamentos'
     | '/configuracoes'
+    | '/entrada-nota-fiscal'
     | '/estoque'
     | '/manutencao'
     | '/maquinas'
@@ -161,13 +222,18 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/'
+    | '/varejistas/$id'
+    | '/varejistas/novo'
+    | '/varejistas'
   id:
     | '__root__'
     | '/_app'
     | '/callback'
     | '/login'
+    | '/sem-ct'
     | '/_app/apontamentos'
     | '/_app/configuracoes'
+    | '/_app/entrada-nota-fiscal'
     | '/_app/estoque'
     | '/_app/manutencao'
     | '/_app/maquinas'
@@ -175,17 +241,29 @@ export interface FileRouteTypes {
     | '/_app/qualidade'
     | '/_app/relatorios'
     | '/_app/usuarios'
+    | '/_app/varejistas'
     | '/_app/'
+    | '/_app/varejistas/$id'
+    | '/_app/varejistas/novo'
+    | '/_app/varejistas/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   CallbackRoute: typeof CallbackRoute
   LoginRoute: typeof LoginRoute
+  SemCtRoute: typeof SemCtRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sem-ct': {
+      id: '/sem-ct'
+      path: '/sem-ct'
+      fullPath: '/sem-ct'
+      preLoaderRoute: typeof SemCtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -212,6 +290,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/varejistas': {
+      id: '/_app/varejistas'
+      path: '/varejistas'
+      fullPath: '/varejistas'
+      preLoaderRoute: typeof AppVarejistasRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/usuarios': {
@@ -263,6 +348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppEstoqueRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/entrada-nota-fiscal': {
+      id: '/_app/entrada-nota-fiscal'
+      path: '/entrada-nota-fiscal'
+      fullPath: '/entrada-nota-fiscal'
+      preLoaderRoute: typeof AppEntradaNotaFiscalRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/configuracoes': {
       id: '/_app/configuracoes'
       path: '/configuracoes'
@@ -277,12 +369,50 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppApontamentosRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/varejistas/': {
+      id: '/_app/varejistas/'
+      path: '/'
+      fullPath: '/varejistas/'
+      preLoaderRoute: typeof AppVarejistasIndexRouteImport
+      parentRoute: typeof AppVarejistasRoute
+    }
+    '/_app/varejistas/novo': {
+      id: '/_app/varejistas/novo'
+      path: '/novo'
+      fullPath: '/varejistas/novo'
+      preLoaderRoute: typeof AppVarejistasNovoRouteImport
+      parentRoute: typeof AppVarejistasRoute
+    }
+    '/_app/varejistas/$id': {
+      id: '/_app/varejistas/$id'
+      path: '/$id'
+      fullPath: '/varejistas/$id'
+      preLoaderRoute: typeof AppVarejistasIdRouteImport
+      parentRoute: typeof AppVarejistasRoute
+    }
   }
 }
+
+interface AppVarejistasRouteChildren {
+  AppVarejistasIdRoute: typeof AppVarejistasIdRoute
+  AppVarejistasNovoRoute: typeof AppVarejistasNovoRoute
+  AppVarejistasIndexRoute: typeof AppVarejistasIndexRoute
+}
+
+const AppVarejistasRouteChildren: AppVarejistasRouteChildren = {
+  AppVarejistasIdRoute: AppVarejistasIdRoute,
+  AppVarejistasNovoRoute: AppVarejistasNovoRoute,
+  AppVarejistasIndexRoute: AppVarejistasIndexRoute,
+}
+
+const AppVarejistasRouteWithChildren = AppVarejistasRoute._addFileChildren(
+  AppVarejistasRouteChildren,
+)
 
 interface AppRouteChildren {
   AppApontamentosRoute: typeof AppApontamentosRoute
   AppConfiguracoesRoute: typeof AppConfiguracoesRoute
+  AppEntradaNotaFiscalRoute: typeof AppEntradaNotaFiscalRoute
   AppEstoqueRoute: typeof AppEstoqueRoute
   AppManutencaoRoute: typeof AppManutencaoRoute
   AppMaquinasRoute: typeof AppMaquinasRoute
@@ -290,12 +420,14 @@ interface AppRouteChildren {
   AppQualidadeRoute: typeof AppQualidadeRoute
   AppRelatoriosRoute: typeof AppRelatoriosRoute
   AppUsuariosRoute: typeof AppUsuariosRoute
+  AppVarejistasRoute: typeof AppVarejistasRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppApontamentosRoute: AppApontamentosRoute,
   AppConfiguracoesRoute: AppConfiguracoesRoute,
+  AppEntradaNotaFiscalRoute: AppEntradaNotaFiscalRoute,
   AppEstoqueRoute: AppEstoqueRoute,
   AppManutencaoRoute: AppManutencaoRoute,
   AppMaquinasRoute: AppMaquinasRoute,
@@ -303,6 +435,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppQualidadeRoute: AppQualidadeRoute,
   AppRelatoriosRoute: AppRelatoriosRoute,
   AppUsuariosRoute: AppUsuariosRoute,
+  AppVarejistasRoute: AppVarejistasRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -312,6 +445,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   CallbackRoute: CallbackRoute,
   LoginRoute: LoginRoute,
+  SemCtRoute: SemCtRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

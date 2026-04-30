@@ -4,15 +4,15 @@
  * Cobertos:
  *   - Renderização do branding FábricaOS
  *   - Exibição do nome do usuário autenticado
- *   - Renderização de itens visíveis por capability
- *   - Ocultação de itens sem capability
- *   - Ausência de seção quando nenhum item é visível
+ *   - Renderização de seções e itens por capability
+ *   - Ocultação de seções sem itens visíveis
+ *   - Comportamento accordion: toggle, estado inicial, accordion exclusivo
+ *   - Seta ChevronDown rotaciona ao abrir/fechar
  *   - Botão de logout chama logout()
  *   - Item ativo destacado baseado no pathname
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import React from 'react'
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
@@ -64,7 +64,6 @@ function setupPermissions(visibleCaps: string[]) {
   })
 }
 
-/** Capabilities de um operador comum (sem gestão) */
 const OPERADOR_CAPS = [
   'view_dashboard',
   'view_ordens',
@@ -73,8 +72,15 @@ const OPERADOR_CAPS = [
   'view_qualidade',
 ]
 
-/** Capabilities de um ADMIN */
-const ADMIN_CAPS = [...OPERADOR_CAPS, 'view_estoque', 'view_manutencao', 'view_relatorios', 'view_usuarios', 'view_configuracoes']
+const ADMIN_CAPS = [
+  ...OPERADOR_CAPS,
+  'view_estoque',
+  'view_manutencao',
+  'view_relatorios',
+  'view_usuarios',
+  'view_configuracoes',
+  'view_varejistas',
+]
 
 // ── Testes ────────────────────────────────────────────────────────────────────
 
@@ -113,7 +119,6 @@ describe('AppSidebar', () => {
     it('usa email como displayName quando first_name está vazio', () => {
       setupAuth({ firstName: '', email: 'operador@fab.com' })
       render(<AppSidebar />)
-      // email aparece tanto no displayName quanto no email secundário
       const emails = screen.getAllByText('operador@fab.com')
       expect(emails.length).toBeGreaterThanOrEqual(1)
     })
@@ -124,52 +129,93 @@ describe('AppSidebar', () => {
     })
   })
 
-  describe('visibilidade de itens — operador comum', () => {
-    it('exibe itens de operação visíveis', () => {
+  describe('renderização de seções', () => {
+    it('exibe seção Operação quando há itens visíveis', () => {
       render(<AppSidebar />)
-      expect(screen.getByText('Dashboard')).toBeDefined()
-      expect(screen.getByText('Ordens de Produção')).toBeDefined()
-      expect(screen.getByText('Apontamentos')).toBeDefined()
-      expect(screen.getByText('Máquinas')).toBeDefined()
-      expect(screen.getByText('Qualidade')).toBeDefined()
-    })
-
-    it('não exibe itens de gestão sem capability', () => {
-      render(<AppSidebar />)
-      expect(screen.queryByText('Usuários')).toBeNull()
-      expect(screen.queryByText('Configurações')).toBeNull()
-      expect(screen.queryByText('Relatórios')).toBeNull()
+      expect(screen.getByText('Operação')).toBeDefined()
     })
 
     it('não exibe seção Gestão quando nenhum item é visível', () => {
       render(<AppSidebar />)
-      // Label da seção não deve aparecer quando sem itens
-      const gestaoLabel = screen.queryByText('Gestão')
-      expect(gestaoLabel).toBeNull()
+      expect(screen.queryByText('Gestão')).toBeNull()
     })
-  })
 
-  describe('visibilidade de itens — ADMIN', () => {
-    beforeEach(() => {
+    it('não exibe seção Cadastro para operador sem capability de varejistas', () => {
+      render(<AppSidebar />)
+      expect(screen.queryByText('Cadastro')).toBeNull()
+    })
+
+    it('exibe as três seções para ADMIN', () => {
       setupPermissions(ADMIN_CAPS)
-    })
-
-    it('exibe itens de gestão para ADMIN', () => {
-      render(<AppSidebar />)
-      expect(screen.getByText('Usuários')).toBeDefined()
-      expect(screen.getByText('Configurações')).toBeDefined()
-      expect(screen.getByText('Relatórios')).toBeDefined()
-    })
-
-    it('exibe seção Gestão para ADMIN', () => {
-      render(<AppSidebar />)
-      expect(screen.getByText('Gestão')).toBeDefined()
-    })
-
-    it('exibe ambas as seções Operação e Gestão para ADMIN', () => {
       render(<AppSidebar />)
       expect(screen.getByText('Operação')).toBeDefined()
       expect(screen.getByText('Gestão')).toBeDefined()
+      expect(screen.getByText('Cadastro')).toBeDefined()
+    })
+  })
+
+  describe('accordion — estado inicial', () => {
+    it('abre seção Operação por padrão quando pathname é /', () => {
+      render(<AppSidebar />)
+      const btn = screen.getByRole('button', { name: /operação/i })
+      expect(btn.getAttribute('aria-expanded')).toBe('true')
+    })
+
+    it('mantém seção Gestão fechada ao iniciar em /', () => {
+      setupPermissions(ADMIN_CAPS)
+      render(<AppSidebar />)
+      const btn = screen.getByRole('button', { name: /gestão/i })
+      expect(btn.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('abre seção Cadastro automaticamente quando pathname está em /varejistas', () => {
+      setupPermissions(ADMIN_CAPS)
+      ;(useLocation as ReturnType<typeof vi.fn>).mockReturnValue({ pathname: '/varejistas' })
+      render(<AppSidebar />)
+      const btn = screen.getByRole('button', { name: /cadastro/i })
+      expect(btn.getAttribute('aria-expanded')).toBe('true')
+    })
+
+    it('abre seção Gestão automaticamente quando pathname está em /estoque', () => {
+      setupPermissions(ADMIN_CAPS)
+      ;(useLocation as ReturnType<typeof vi.fn>).mockReturnValue({ pathname: '/estoque' })
+      render(<AppSidebar />)
+      const btn = screen.getByRole('button', { name: /gestão/i })
+      expect(btn.getAttribute('aria-expanded')).toBe('true')
+    })
+  })
+
+  describe('accordion — toggle', () => {
+    it('fecha seção aberta ao clicar nela novamente', () => {
+      render(<AppSidebar />)
+      const btn = screen.getByRole('button', { name: /operação/i })
+      expect(btn.getAttribute('aria-expanded')).toBe('true')
+      fireEvent.click(btn)
+      expect(btn.getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('abre seção fechada ao clicar nela', () => {
+      setupPermissions(ADMIN_CAPS)
+      render(<AppSidebar />)
+      const btnGestao = screen.getByRole('button', { name: /gestão/i })
+      expect(btnGestao.getAttribute('aria-expanded')).toBe('false')
+      fireEvent.click(btnGestao)
+      expect(btnGestao.getAttribute('aria-expanded')).toBe('true')
+    })
+
+    it('fecha a seção anterior ao abrir uma nova (accordion)', () => {
+      setupPermissions(ADMIN_CAPS)
+      render(<AppSidebar />)
+      const btnOperacao = screen.getByRole('button', { name: /operação/i })
+      const btnGestao = screen.getByRole('button', { name: /gestão/i })
+
+      expect(btnOperacao.getAttribute('aria-expanded')).toBe('true')
+      expect(btnGestao.getAttribute('aria-expanded')).toBe('false')
+
+      fireEvent.click(btnGestao)
+
+      expect(btnOperacao.getAttribute('aria-expanded')).toBe('false')
+      expect(btnGestao.getAttribute('aria-expanded')).toBe('true')
     })
   })
 
@@ -184,7 +230,6 @@ describe('AppSidebar', () => {
 
   describe('estado ativo', () => {
     it('marca Dashboard como ativo quando pathname é /', () => {
-      ;(useLocation as ReturnType<typeof vi.fn>).mockReturnValue({ pathname: '/' })
       render(<AppSidebar />)
       const dashLink = screen.getByRole('link', { name: /dashboard/i })
       expect(dashLink.getAttribute('aria-current')).toBe('page')
@@ -195,6 +240,22 @@ describe('AppSidebar', () => {
       render(<AppSidebar />)
       const dashLink = screen.getByRole('link', { name: /dashboard/i })
       expect(dashLink.getAttribute('aria-current')).toBeNull()
+    })
+
+    it('marca Varejistas como ativo quando pathname é /varejistas', () => {
+      setupPermissions(ADMIN_CAPS)
+      ;(useLocation as ReturnType<typeof vi.fn>).mockReturnValue({ pathname: '/varejistas' })
+      render(<AppSidebar />)
+      const link = screen.getByRole('link', { name: /varejistas/i })
+      expect(link.getAttribute('aria-current')).toBe('page')
+    })
+
+    it('marca Varejistas como ativo em sub-rota /varejistas/novo', () => {
+      setupPermissions(ADMIN_CAPS)
+      ;(useLocation as ReturnType<typeof vi.fn>).mockReturnValue({ pathname: '/varejistas/novo' })
+      render(<AppSidebar />)
+      const link = screen.getByRole('link', { name: /varejistas/i })
+      expect(link.getAttribute('aria-current')).toBe('page')
     })
   })
 })

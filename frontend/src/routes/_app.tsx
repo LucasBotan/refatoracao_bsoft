@@ -27,13 +27,22 @@ const PAGE_TITLES: Record<string, string> = {
   '/estoque': 'Estoque',
   '/manutencao': 'Manutenção',
   '/relatorios': 'Relatórios',
+  '/varejistas': 'Varejistas',
+  '/varejistas/novo': 'Novo Varejista',
   '/usuarios': 'Usuários',
   '/configuracoes': 'Configurações',
+  '/entrada-nota-fiscal': 'Entrada de Nota Fiscal',
+}
+
+function getPageTitle(pathname: string): string {
+  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname]
+  if (pathname.startsWith('/varejistas/')) return 'Varejistas'
+  return 'FábricaOS'
 }
 
 function AppLayout() {
   const location = useLocation()
-  const title = PAGE_TITLES[location.pathname] ?? 'FábricaOS'
+  const title = getPageTitle(location.pathname)
 
   return (
     <RequireAuth>
